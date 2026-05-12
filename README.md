@@ -2,6 +2,8 @@
 
 This repository provides an interactive web-based visualization of the Rapidly-exploring Random Tree (RRT) algorithm and its optimal variants.
 
+<img alt="RRT Playground" src="https://raw.githubusercontent.com/duy-phamduc68/RRT-Playground/main/media/showcase.gif" width="100%">
+
 Check out the technical breakdown here:
 
 - [Blog post](#) (coming soon)
