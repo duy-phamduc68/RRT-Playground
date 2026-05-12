@@ -29,7 +29,7 @@ export class IRRTStar extends RRTStar {
         const theta = Math.atan2(this.goal.y - this.start.y, this.goal.x - this.start.x);
         
         const rx = cBest / 2;
-        const ry = Math.sqrt(cBest*cBest - this.cMin*this.cMin) / 2;
+        const ry = Math.sqrt(Math.max(0, cBest*cBest - this.cMin*this.cMin)) / 2;
         
         do {
             // Sample unit circle
