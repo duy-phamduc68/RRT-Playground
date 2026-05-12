@@ -43,7 +43,7 @@ function init() {
                     <p>It supports both single algorithm analysis and side-by-side performance comparisons under various procedurally generated environments.</p>
                 </div>
                 <div style="text-align: right; margin-top: 20px;">
-                    <a href="https://github.com" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: bold;">View on GitHub</a>
+                    <a href="https://github.com/duy-phamduc68/RRT-Playground" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: bold;">View on GitHub</a>
                 </div>
             `,
             buttons: [
