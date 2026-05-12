@@ -307,6 +307,12 @@ function restartPlanners() {
     clearRunningStat();
     State.planners = [];
     
+    if (State.currentConfig.app.randomize_smp_seed) {
+        const newSeed = Math.floor(Math.random() * 1000000);
+        State.currentConfig.simulation.smp_seed = newSeed;
+        State.stagedConfig.simulation.smp_seed = newSeed;
+    }
+    
     const algMap = {
         'rrt': RRT,
         'rrt_star': RRTStar,
