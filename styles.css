@@ -434,3 +434,118 @@ body {
     justify-content: flex-end;
     gap: 12px;
 }
+
+/* Portrait / Vertical Layout */
+@media (orientation: portrait) {
+    .app-container {
+        flex-direction: column;
+        padding-left: 30px;
+        box-sizing: border-box;
+    }
+    
+    .stats-panel {
+        width: 100% !important;
+        max-width: none;
+        height: 45vh;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .resizer {
+        width: 100%;
+        height: 6px;
+        cursor: row-resize;
+    }
+    
+    .sidebar {
+        width: calc(100% - 30px);
+        left: -100%;
+        position: fixed;
+        height: 100vh;
+    }
+    .sidebar.open {
+        left: 30px;
+    }
+    .sidebar-toggle-col {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 101;
+    }
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+    body {
+        overflow: auto;
+    }
+    
+    .app-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        padding-left: 30px;
+        box-sizing: border-box;
+    }
+    
+    .main-area {
+        height: auto;
+        min-height: 50vh;
+    }
+    
+    .canvas-wrapper {
+        position: relative;
+        height: 50vh;
+    }
+    
+    .canvas-wrapper.compare-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 50vh);
+        height: auto;
+    }
+    
+    .resizer {
+        display: none;
+    }
+    
+    .stats-panel {
+        display: contents;
+    }
+    
+    .scenario-controls {
+        order: -1;
+        position: sticky;
+        top: 0;
+        z-index: 90;
+        background-color: var(--bg-panel);
+        border-bottom: 1px solid var(--border-color);
+        padding: 15px;
+    }
+    
+    .stats-console {
+        order: 3;
+        height: 60vh;
+        width: 100%;
+        background-color: var(--bg-panel);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        position: fixed;
+        height: 100vh;
+        width: calc(100% - 30px);
+        left: -100%;
+    }
+    .sidebar.open {
+        left: 30px;
+    }
+    .sidebar-toggle-col {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 101;
+    }
+}

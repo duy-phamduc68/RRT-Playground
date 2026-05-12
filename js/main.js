@@ -73,13 +73,25 @@ function init() {
 
     document.addEventListener('mousemove', (e) => {
         if (!isResizing) return;
-        // Calculate new width: window width - mouse X position
-        const newWidth = document.body.clientWidth - e.clientX;
-        // Clamp width based on CSS constraints
-        if (newWidth > 200 && newWidth < 600) {
-            statsPanel.style.width = `${newWidth}px`;
-            // Trigger resize for all renderers
-            renderers.forEach(r => r.resize());
+        
+        const isColumnLayout = window.matchMedia("(orientation: portrait)").matches;
+        
+        if (isColumnLayout) {
+            // Calculate new height: window height - mouse Y position
+            const newHeight = document.body.clientHeight - e.clientY;
+            if (newHeight > 200 && newHeight < document.body.clientHeight - 200) {
+                statsPanel.style.height = `${newHeight}px`;
+                statsPanel.style.width = '100%';
+                renderers.forEach(r => r.resize());
+            }
+        } else {
+            // Calculate new width: window width - mouse X position
+            const newWidth = document.body.clientWidth - e.clientX;
+            if (newWidth > 200 && newWidth < 600) {
+                statsPanel.style.width = `${newWidth}px`;
+                statsPanel.style.height = '100%';
+                renderers.forEach(r => r.resize());
+            }
         }
     });
 
@@ -208,7 +220,7 @@ function setupCanvasInteractions(renderer, idx) {
     const canvas = renderer.canvas;
     
     // We only process clicks if pending
-    canvas.addEventListener('mousedown', (e) => {
+    canvas.addEventListener('click', (e) => {
         // Prevent action if middle/right click
         if (e.button !== 0) return;
         
@@ -222,9 +234,8 @@ function setupCanvasInteractions(renderer, idx) {
         const rawY = e.clientY - rect.top;
         
         // Inverse transform to get world coords
-        const dpr = window.devicePixelRatio || 1;
-        const tx = (rawX * dpr - renderer.transform.x) / renderer.transform.k;
-        const ty = (rawY * dpr - renderer.transform.y) / renderer.transform.k;
+        const tx = (rawX - renderer.transform.x) / renderer.transform.k;
+        const ty = (rawY - renderer.transform.y) / renderer.transform.k;
         
         const p = {x: tx, y: ty};
         
