@@ -8,9 +8,15 @@ export class BITStar extends BasePlanner {
         this.cMin = distance(start, goal);
         
         this.V = [this.nodes[0]];
-        this.X_unconn = [];
+        this.nextId = 1;
+        const goalNode = { id: this.nextId++, x: this.goal.x, y: this.goal.y, cost: Infinity, parent: null };
+        this.X_unconn = [goalNode]; // explicitly add goal as a sample
         this.VQ = [];
         this.EQ = [];
+        
+        this.unexpanded = [this.nodes[0]];
+        this.x_new = [];
+        this.x_reuse = [];
         
         this.r = this.algConfig.rewire_radius;
         this.batchCount = 0;
@@ -55,6 +61,48 @@ export class BITStar extends BasePlanner {
         return {x, y};
     }
     
+    prune() {
+        this.x_reuse = [];
+        const newUnconn = [];
+        for (const n of this.X_unconn) {
+            const fHat = distance(this.start, n) + this.h(n);
+            if (fHat < this.pathCost) {
+                newUnconn.push(n);
+            }
+        }
+        this.X_unconn = newUnconn;
+        
+        const newNodes = [];
+        const newEdges = [];
+        
+        for (const v of this.nodes) {
+            // Keep start node and current best path nodes
+            if (v.id === this.nodes[0].id || (this.path && this.path.some(p => p.x === v.x && p.y === v.y))) {
+                newNodes.push(v);
+                continue;
+            }
+            
+            const fHat = distance(this.start, v) + this.h(v);
+            if (fHat <= this.pathCost && (v.cost + this.h(v)) <= this.pathCost) {
+                newNodes.push(v);
+            } else {
+                if (fHat <= this.pathCost) {
+                    v.parent = null;
+                    v.cost = Infinity;
+                    this.x_reuse.push(v);
+                }
+            }
+        }
+        
+        this.nodes = newNodes;
+        for (const e of this.edges) {
+            if (newNodes.includes(e.from) && newNodes.includes(e.to)) {
+                newEdges.push(e);
+            }
+        }
+        this.edges = newEdges;
+    }
+    
     step() {
         if (this.finished) return;
         
@@ -85,6 +133,17 @@ export class BITStar extends BasePlanner {
         // 1. If both queues are empty, sample new batch
         if (this.VQ.length === 0 && this.EQ.length === 0) {
             this.batchCount++;
+            
+            if (this.firstSolutionFound) {
+                this.prune();
+            }
+            
+            this.x_new = [...this.x_reuse];
+            // Add reused nodes back to unconnected pool
+            for (const r of this.x_reuse) {
+                this.X_unconn.push(r);
+            }
+            
             // Generate samples
             const samplesToGen = this.algConfig.samples_per_batch;
             for (let i = 0; i < samplesToGen; i++) {
@@ -94,14 +153,18 @@ export class BITStar extends BasePlanner {
                 } else {
                     q = this.getRandomSample();
                 }
-                this.X_unconn.push(q);
-                this.samples.push(q);
+                const node = { id: this.nextId++, x: q.x, y: q.y, cost: Infinity, parent: null };
+                this.x_new.push(node);
+                this.X_unconn.push(node);
+                this.samples.push(node);
             }
             
             // Rebuild VQ from all nodes in tree
             this.VQ = [...this.nodes];
             // Sort VQ by f(v)
             this.VQ.sort((a, b) => (a.cost + this.h(a)) - (b.cost + this.h(b)));
+            
+            this.unexpanded = [...this.nodes];
         }
         
         // Evaluate condition for expanding VQ vs EQ
@@ -116,22 +179,38 @@ export class BITStar extends BasePlanner {
             const v = this.VQ.shift();
             
             // Find nearby unconnected samples
-            for (const x of this.X_unconn) {
-                if (distance(v, x) <= this.r) {
-                    const estCost = v.cost + distance(v, x) + this.h(x);
-                    if (estCost < this.pathCost) {
-                        this.EQ.push({from: v, to: x});
-                    }
+            let xNear = [];
+            if (this.unexpanded.includes(v)) {
+                xNear = this.X_unconn.filter(x => distance(v, x) <= this.r);
+            } else {
+                xNear = this.X_unconn.filter(x => this.x_new.includes(x) && distance(v, x) <= this.r);
+            }
+            
+            for (const x of xNear) {
+                const aHat = distance(this.start, v) + distance(v, x) + this.h(x);
+                if (aHat < this.pathCost) {
+                    this.EQ.push({from: v, to: x});
                 }
             }
             
-            // Find nearby connected nodes to rewire
-            for (const w of this.nodes) {
-                if (v.id !== w.id && distance(v, w) <= this.r) {
-                    const estCost = v.cost + distance(v, w) + this.h(w);
-                    if (estCost < this.pathCost && estCost < w.cost) {
-                        this.EQ.push({from: v, to: w});
+            if (this.unexpanded.includes(v)) {
+                // Find nearby connected nodes to rewire
+                for (const w of this.nodes) {
+                    if (v.id !== w.id && distance(v, w) <= this.r) {
+                        const aHat = distance(this.start, v) + distance(v, w) + this.h(w);
+                        if (aHat < this.pathCost && (distance(this.start, v) + distance(v, w) < w.cost)) {
+                            const edgeExists = this.edges.some(e => e.from.id === v.id && e.to.id === w.id);
+                            if (!edgeExists) {
+                                this.EQ.push({from: v, to: w});
+                            }
+                        }
                     }
+                }
+                
+                // Remove v from unexpanded
+                const unIdx = this.unexpanded.indexOf(v);
+                if (unIdx !== -1) {
+                    this.unexpanded.splice(unIdx, 1);
                 }
             }
             
@@ -162,21 +241,19 @@ export class BITStar extends BasePlanner {
                             const idx = this.X_unconn.indexOf(x);
                             this.X_unconn.splice(idx, 1);
                             
-                            w = {
-                                id: this.nodes.length,
-                                x: x.x, y: x.y,
-                                parent: v,
-                                cost: v.cost + distance(v, x)
-                            };
-                            this.nodes.push(w);
-                            this.edges.push({from: v, to: w});
-                            this.VQ.push(w);
+                            x.parent = v;
+                            x.cost = v.cost + distance(v, x);
+                            
+                            this.nodes.push(x);
+                            this.edges.push({from: v, to: x});
+                            this.unexpanded.push(x);
+                            this.VQ.push(x);
                             
                             // Re-sort VQ
                             this.VQ.sort((a, b) => (a.cost + this.h(a)) - (b.cost + this.h(b)));
                             
                             // Check goal
-                            if (distance(w, this.goal) <= this.config.simulation.goal_radius) {
+                            if (distance(x, this.goal) <= this.config.simulation.goal_radius) {
                                 if (!this.firstSolutionFound) {
                                     this.firstSolutionFound = true;
                                     this.solutionFoundIteration = this.iterations;
@@ -194,10 +271,13 @@ export class BITStar extends BasePlanner {
                             
                             // Cascading cost update BFS
                             const queue = [x];
+                            const visited = new Set([x.id]);
                             while(queue.length > 0) {
                                 const curr = queue.shift();
                                 for (const edge of this.edges) {
                                     if (edge.from.id === curr.id) {
+                                        if (visited.has(edge.to.id)) continue;
+                                        visited.add(edge.to.id);
                                         edge.to.cost = curr.cost + distance(curr, edge.to);
                                         queue.push(edge.to);
                                     }

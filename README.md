@@ -25,4 +25,4 @@ Compare mode showing execution on a procedurally generated random forest environ
 - RRT (Rapidly-exploring Random Tree)
 - RRT* (Optimal RRT)
 - Informed RRT*
-- BIT* (Batch Informed Trees)
+- BIT* (Batch Informed Trees) - Reference: [marleyshan21/Batch-informed-trees](https://github.com/marleyshan21/Batch-informed-trees)
