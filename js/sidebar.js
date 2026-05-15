@@ -8,19 +8,22 @@ export function setupSidebar() {
     const overlay = document.getElementById('canvas-overlay');
     const btnRestore = document.getElementById('btn-restore-default');
     const btnConfirm = document.getElementById('btn-confirm-args');
-    
-    toggleBtn.addEventListener('click', () => {
-        const isOpen = sidebar.classList.toggle('open');
+
+    const setSidebarOpen = (isOpen, options = {}) => {
+        sidebar.classList.toggle('open', isOpen);
         const arrow = document.getElementById('sidebar-arrow');
-        if (isOpen) {
-            arrow.style.transform = 'rotate(180deg)';
-            overlay.classList.add('active');
+        arrow.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+        overlay.classList.toggle('active', isOpen);
+
+        if (isOpen && options.resetStaging) {
             State.resetStaging();
             renderForm();
-        } else {
-            arrow.style.transform = 'rotate(0deg)';
-            overlay.classList.remove('active');
         }
+    };
+    
+    toggleBtn.addEventListener('click', () => {
+        const shouldOpen = !sidebar.classList.contains('open');
+        setSidebarOpen(shouldOpen, { resetStaging: true });
     });
     
     btnRestore.addEventListener('click', () => {
@@ -43,8 +46,7 @@ export function setupSidebar() {
     
     btnConfirm.addEventListener('click', () => {
         State.commitStaging();
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
+        setSidebarOpen(false);
         
         // Trigger re-layout if mode changed
         document.dispatchEvent(new CustomEvent('configChanged'));

@@ -21,6 +21,17 @@ let animationFrameId = null;
 let isPaused = false;
 let runStartTime = 0;
 
+function formatAlgoMetrics(planner, elapsedSecs, includeCost) {
+    const vCount = planner.nodes.length;
+    const eCount = planner.edges ? planner.edges.length : Math.max(0, vCount - 1);
+    const metrics = [`Time: ${elapsedSecs}s`, `Iters: ${planner.iterations}`];
+    if (includeCost) {
+        metrics.push(`Cost: ${planner.pathCost.toFixed(2)}`);
+    }
+    metrics.push(`V: ${vCount}`, `E: ${eCount}`);
+    return metrics.join(', ');
+}
+
 function init() {
     setupSidebar();
     
@@ -375,9 +386,9 @@ function runLoop() {
                 
                 if (!wasFound && p.firstSolutionFound) {
                     if (p.algConfig && p.algConfig.optimize_after_first_solution) {
-                        const vCount = p.nodes.length;
-                        const eCount = p.edges ? p.edges.length : Math.max(0, vCount - 1);
-                        log(`[${p.type.toUpperCase()}] Initial path found at iteration ${p.iterations} (Cost: ${p.pathCost.toFixed(2)}, V: ${vCount}, E: ${eCount}). Optimizing...`, 'info-blue');
+                        const elapsedSecs = ((performance.now() - runStartTime) / 1000).toFixed(3);
+                        const metrics = formatAlgoMetrics(p, elapsedSecs, true);
+                        log(`[${p.type.toUpperCase()}] Initial path found. ${metrics}. Optimizing...`, 'info-blue');
                         const r = renderers.find(ren => ren.planner === p);
                         if (r && r.labelElement) r.labelElement.style.color = 'var(--accent)';
                     }
@@ -385,14 +396,14 @@ function runLoop() {
                 
                 if (p.finished) {
                     const elapsedSecs = ((performance.now() - runStartTime) / 1000).toFixed(3);
-                    const vCount = p.nodes.length;
-                    const eCount = p.edges ? p.edges.length : Math.max(0, vCount - 1);
                     if (p.firstSolutionFound) {
-                        log(`[${p.type.toUpperCase()}] Finished! Final Cost: ${p.pathCost.toFixed(2)} in ${p.iterations} iters, Time: ${elapsedSecs}s (V: ${vCount}, E: ${eCount})`, 'success');
+                        const metrics = formatAlgoMetrics(p, elapsedSecs, true);
+                        log(`[${p.type.toUpperCase()}] Finished. ${metrics}`, 'success');
                         const r = renderers.find(ren => ren.planner === p);
                         if (r && r.labelElement) r.labelElement.style.color = 'var(--success)';
                     } else {
-                        log(`[${p.type.toUpperCase()}] Finished without solution. Time: ${elapsedSecs}s (V: ${vCount}, E: ${eCount})`, 'error');
+                        const metrics = formatAlgoMetrics(p, elapsedSecs, false);
+                        log(`[${p.type.toUpperCase()}] Finished without solution. ${metrics}`, 'error');
                         const r = renderers.find(ren => ren.planner === p);
                         if (r && r.labelElement) r.labelElement.style.color = 'var(--danger)';
                     }
