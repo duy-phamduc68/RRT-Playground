@@ -132,6 +132,7 @@ function renderForm() {
             r.min = min; 
             r.max = max; 
             r.value = val;
+            r.tabIndex = -1;
             
             const n = document.createElement('input');
             n.type = 'number'; 
@@ -204,6 +205,8 @@ function renderForm() {
     
     if (config.environment.default_type === 'random_forest') {
         const gRF = createGroup('Random Forest Settings');
+        createInput(gRF, 'Map Width', 'environment.default_width', 'range', 300, 3000, 10);
+        createInput(gRF, 'Map Height', 'environment.default_height', 'range', 300, 3000, 10);
         createInput(gRF, 'Circle Count', 'random_forest.circle_count', 'range', 0, 200);
         createInput(gRF, 'Circle Radius Min', 'random_forest.circle_radius_min', 'range', 5, 50);
         createInput(gRF, 'Circle Radius Max', 'random_forest.circle_radius_max', 'range', 5, 100);
