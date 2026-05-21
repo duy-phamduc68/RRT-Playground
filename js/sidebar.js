@@ -201,7 +201,11 @@ function renderForm() {
     
     // --- ENVIRONMENT ---
     const gEnv = createGroup('Environment');
-    createInput(gEnv, 'Type', 'environment.default_type', 'select', [{value:'random_forest', label:'Random Forest'}, {value:'maze', label:'Maze'}]);
+    createInput(gEnv, 'Type', 'environment.default_type', 'select', [
+        {value:'random_forest', label:'Random Forest'},
+        {value:'maze', label:'Maze'},
+        {value:'empty', label:'Empty'}
+    ]);
     
     if (config.environment.default_type === 'random_forest') {
         const gRF = createGroup('Random Forest Settings');
@@ -213,11 +217,15 @@ function renderForm() {
         createInput(gRF, 'Rectangle Count', 'random_forest.rectangle_count', 'range', 0, 200);
         createInput(gRF, 'Rectangle Size Min', 'random_forest.rectangle_size_min', 'range', 10, 100);
         createInput(gRF, 'Rectangle Size Max', 'random_forest.rectangle_size_max', 'range', 10, 200);
-    } else {
+    } else if (config.environment.default_type === 'maze') {
         const gMz = createGroup('Maze Settings');
         createInput(gMz, 'Rows', 'maze.rows', 'range', 5, 50);
         createInput(gMz, 'Cols', 'maze.cols', 'range', 5, 50);
         createInput(gMz, 'Corridor Size', 'maze.corridor_size', 'range', 10, 100);
+    } else {
+        const gEmpty = createGroup('Empty Settings');
+        createInput(gEmpty, 'Map Width', 'environment.default_width', 'range', 300, 3000, 10);
+        createInput(gEmpty, 'Map Height', 'environment.default_height', 'range', 300, 3000, 10);
     }
     
     // --- ALGORITHM ---

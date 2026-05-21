@@ -20,6 +20,8 @@ export class Environment {
             this.generateRandomForest();
         } else if (this.type === 'maze') {
             this.generateMaze();
+        } else if (this.type === 'empty') {
+            // No obstacles for the empty environment.
         }
     }
     
