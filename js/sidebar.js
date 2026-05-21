@@ -73,12 +73,59 @@ function renderForm() {
         return val1 !== val2;
     };
     
+    const captureFocusState = () => {
+        const active = document.activeElement;
+        if (!active) return null;
+        const path = active.getAttribute('data-path');
+        if (!path) return null;
+        return {
+            path,
+            role: active.getAttribute('data-input-role')
+        };
+    };
+
+    const restoreFocusState = (state) => {
+        if (!state || !state.path) return;
+        const roleSelector = state.role ? `[data-input-role="${state.role}"]` : '';
+        const target = container.querySelector(`[data-path="${state.path}"]${roleSelector}`);
+        if (target && typeof target.focus === 'function') {
+            target.focus();
+        }
+    };
+
+    const updateItemState = (path) => {
+        const item = container.querySelector(`.config-item[data-path="${path}"]`);
+        if (!item) return;
+        item.classList.remove('staged', 'modified');
+        const inputType = item.getAttribute('data-input-type');
+        if (inputType === 'select' || inputType === 'checkbox') return;
+        if (isStaged(path)) item.classList.add('staged');
+        else if (isModified(path)) item.classList.add('modified');
+    };
+
     const setVal = (path, val) => {
         const parts = path.split('.');
         let obj = config;
         for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
         obj[parts[parts.length - 1]] = val;
-        renderForm(); // Re-render to update italics
+
+        const requiresRerender = new Set([
+            'app.default_mode',
+            'app.randomize_env_seed',
+            'app.randomize_smp_seed',
+            'environment.default_type',
+            'app.algorithm'
+        ]).has(path);
+
+        if (requiresRerender) {
+            const focusState = captureFocusState();
+            const scrollTop = container.scrollTop;
+            renderForm();
+            container.scrollTop = scrollTop;
+            restoreFocusState(focusState);
+        } else {
+            updateItemState(path);
+        }
     };
     
     const createGroup = (title) => {
@@ -93,6 +140,8 @@ function renderForm() {
     
     const createInput = (parent, label, path, type, min, max, step = null) => {
         const div = document.createElement('div');
+        div.dataset.path = path;
+        div.dataset.inputType = type;
         
         let itemClass = 'config-item';
         if (type !== 'select' && type !== 'checkbox') {
@@ -110,6 +159,7 @@ function renderForm() {
         if (type === 'select') {
             const sel = document.createElement('select');
             sel.className = 'config-input';
+            sel.dataset.path = path;
             for (const opt of min) { // min acts as options array here
                 const o = document.createElement('option');
                 o.value = opt.value;
@@ -118,6 +168,12 @@ function renderForm() {
                 sel.appendChild(o);
             }
             sel.addEventListener('change', (e) => setVal(path, isNaN(e.target.value) && e.target.value !== 'true' && e.target.value !== 'false' ? e.target.value : (e.target.value === 'true' ? true : (e.target.value === 'false' ? false : Number(e.target.value)))));
+            sel.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    sel.blur();
+                }
+            });
             div.appendChild(sel);
         } else if (type === 'range') {
             const wrap = document.createElement('div');
@@ -133,6 +189,8 @@ function renderForm() {
             r.max = max; 
             r.value = val;
             r.tabIndex = -1;
+            r.dataset.path = path;
+            r.dataset.inputRole = 'range';
             
             const n = document.createElement('input');
             n.type = 'number'; 
@@ -141,10 +199,18 @@ function renderForm() {
             n.max = max; 
             n.value = val;
             n.className = 'config-input';
+            n.dataset.path = path;
+            n.dataset.inputRole = 'number';
             
             r.addEventListener('input', (e) => { n.value = e.target.value; });
             r.addEventListener('change', (e) => { setVal(path, Number(e.target.value)); });
             n.addEventListener('change', (e) => { r.value = e.target.value; setVal(path, Number(e.target.value)); });
+            n.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    n.blur();
+                }
+            });
             
             wrap.appendChild(r); wrap.appendChild(n);
             div.appendChild(wrap);
@@ -153,7 +219,18 @@ function renderForm() {
             cb.type = 'checkbox';
             cb.checked = val;
             cb.style.cursor = 'pointer';
+            cb.dataset.path = path;
             cb.addEventListener('change', (e) => setVal(path, e.target.checked));
+            cb.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cb.blur();
+                }
+            });
+
+            const id = `cfg-${path.replace(/\./g, '-')}`;
+            cb.id = id;
+            lbl.setAttribute('for', id);
             
             // Insert checkbox before label
             div.insertBefore(cb, lbl);
@@ -173,7 +250,14 @@ function renderForm() {
             inp.type = type;
             inp.className = 'config-input';
             inp.value = val;
+            inp.dataset.path = path;
             inp.addEventListener('change', (e) => setVal(path, type==='number' ? Number(e.target.value) : e.target.value));
+            inp.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    inp.blur();
+                }
+            });
             div.appendChild(inp);
         }
         
