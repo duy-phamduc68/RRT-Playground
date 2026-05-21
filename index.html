@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RRT Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- App-wide overlay for sidebar -->
+        <div id="canvas-overlay" class="overlay"></div>
+        
+        <!-- Thin column for toggling -->
+        <div id="sidebar-toggle" class="sidebar-toggle-col">
+            <span class="arrow" id="sidebar-arrow">▶</span>
+        </div>
+        
+        <!-- Left Sidebar (Collapsible overlay) -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>Configuration</h2>
+            </div>
+            <div class="sidebar-content" id="config-form">
+                <!-- Config items injected via JS -->
+            </div>
+            <div class="sidebar-footer">
+                <button id="btn-restore-default" class="btn outline">Restore Default</button>
+                <button id="btn-confirm-args" class="btn primary">Confirm Args</button>
+            </div>
+        </aside>
+
+        <!-- Main Canvas Area -->
+        <main id="main-area" class="main-area">
+            <div id="canvas-wrapper" class="canvas-wrapper">
+                <!-- Single mode canvas or 2x2 compare mode grid goes here -->
+            </div>
+        </main>
+
+        <div id="resizer" class="resizer"></div>
+
+        <!-- Right Stats Panel -->
+        <aside id="stats-panel" class="stats-panel">
+            <div class="scenario-controls" style="position: relative;">
+                <div style="position: absolute; top: 10px; right: 10px;">
+                    <button id="btn-info" class="btn outline" style="width: 24px; height: 24px; padding: 0; line-height: 22px; font-weight: bold; border-radius: 4px;" title="About">i</button>
+                </div>
+                <div class="status-indicator">
+                    Status: <span id="scenario-status" class="status-badge pending">Pending</span>
+                </div>
+                <div class="btn-group">
+                    <button id="btn-reset" class="btn outline" disabled>Reset</button>
+                    <button id="btn-pause" class="btn outline" disabled>Pause</button>
+                    <button id="btn-start" class="btn primary" disabled>Start</button>
+                    <button id="btn-restart" class="btn secondary hidden">Restart</button>
+                </div>
+            </div>
+            <div class="stats-console">
+                <div class="console-header">Statistics & Logs</div>
+                <div id="terminal-output" class="terminal-output">
+                    <div class="log-line info">RRT Playground Initialized.</div>
+                    <div class="log-line info">Click on the canvas to place the Start position.</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modal-title">Title</h3>
+            <div id="modal-content" class="modal-content">Content</div>
+            <div class="modal-actions" id="modal-actions">
+                <!-- Buttons injected via JS -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
