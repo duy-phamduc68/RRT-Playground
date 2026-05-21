@@ -70,6 +70,7 @@ body {
     gap: 20px;
     align-items: start;
     align-content: start;
+    scrollbar-gutter: stable;
 }
 
 .canvas-cell {
@@ -364,6 +365,12 @@ body {
 .config-input:focus {
     outline: none;
     border-color: var(--accent);
+}
+
+.config-item input:focus-visible,
+.config-item select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
 }
 
 .slider-group {
