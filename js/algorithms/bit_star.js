@@ -145,7 +145,9 @@ export class BITStar extends BasePlanner {
             }
             
             // Generate samples
-            const samplesToGen = this.algConfig.samples_per_batch;
+            const samplesToGen = Number.isFinite(this.algConfig.batch_size)
+                ? this.algConfig.batch_size
+                : this.algConfig.samples_per_batch;
             for (let i = 0; i < samplesToGen; i++) {
                 let q;
                 if (this.pathCost < Infinity) {

@@ -262,6 +262,7 @@ function renderForm() {
     const gRen = createGroup('Rendering');
     createInput(gRen, 'Draw Grid', 'rendering.draw_grid', 'checkbox');
     createInput(gRen, 'Draw Samples', 'rendering.draw_samples', 'checkbox');
+    createInput(gRen, 'Show All Samples', 'rendering.show_all_samples', 'checkbox');
     createInput(gRen, 'Draw Nodes', 'rendering.draw_nodes', 'checkbox');
     createInput(gRen, 'Draw Rejected Edges', 'rendering.draw_rejected_edges', 'checkbox');
 }
