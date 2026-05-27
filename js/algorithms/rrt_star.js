@@ -53,7 +53,7 @@ export class RRTStar extends BasePlanner {
         // 3. Steer
         const q_new_pos = this.steer(q_near, q_rand, this.algConfig.step_size);
         
-        if (this.env.isCollisionFree(q_near, q_new_pos, this.config.simulation.robot_radius)) {
+        if (this.isCollisionFree(q_near, q_new_pos)) {
             // RRT* Extensions
             
             // 4. Find Near Neighbors
@@ -71,7 +71,7 @@ export class RRTStar extends BasePlanner {
             // 5. Choose Parent
             for (const q_n of q_near_nodes) {
                 const c_test = q_n.cost + distance(q_n, q_new_pos);
-                if (c_test < c_min && this.env.isCollisionFree(q_n, q_new_pos, this.config.simulation.robot_radius)) {
+                if (c_test < c_min && this.isCollisionFree(q_n, q_new_pos)) {
                     q_min = q_n;
                     c_min = c_test;
                 }
@@ -93,7 +93,7 @@ export class RRTStar extends BasePlanner {
                 if (q_n.id === q_min.id || q_n.id === 0) continue; // skip start and parent
                 
                 const c_test = q_new.cost + distance(q_new, q_n);
-                if (c_test < q_n.cost && this.env.isCollisionFree(q_new, q_n, this.config.simulation.robot_radius)) {
+                if (c_test < q_n.cost && this.isCollisionFree(q_new, q_n)) {
                     // Rewire q_n to q_new
                     const oldEdgeIdx = this.edges.findIndex(e => e.to.id === q_n.id);
                     if (oldEdgeIdx !== -1) {

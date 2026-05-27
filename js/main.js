@@ -28,7 +28,7 @@ function formatAlgoMetrics(planner, elapsedSecs, includeCost) {
     if (includeCost) {
         metrics.push(`Cost: ${planner.pathCost.toFixed(2)}`);
     }
-    metrics.push(`V: ${vCount}`, `E: ${eCount}`);
+    metrics.push(`V: ${vCount}`, `E: ${eCount}`, `CC: ${planner.collisionChecks}`);
     return metrics.join(', ');
 }
 
@@ -417,7 +417,7 @@ function runLoop() {
     
     if (!allFinished) {
         const elapsedSecs = ((performance.now() - runStartTime) / 1000).toFixed(3);
-        const statsStr = State.planners.map(p => `${p.type.toUpperCase()}: ${p.iterations} iters`).join(' | ');
+        const statsStr = State.planners.map(p => `${p.type.toUpperCase()}: ${p.iterations} iters, ${p.collisionChecks} CC`).join(' | ');
         updateRunningStat(`T=${elapsedSecs}s | ${statsStr}`);
         animationFrameId = requestAnimationFrame(runLoop);
     } else {

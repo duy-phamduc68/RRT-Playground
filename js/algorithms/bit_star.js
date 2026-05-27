@@ -235,7 +235,7 @@ export class BITStar extends BasePlanner {
                 let w = x;
                 
                 if (v.cost + distance(v, x) < (isUnconnected ? Infinity : x.cost)) {
-                    if (this.env.isCollisionFree(v, x, this.config.simulation.robot_radius)) {
+                    if (this.isCollisionFree(v, x)) {
                         if (isUnconnected) {
                             // Add to tree
                             const idx = this.X_unconn.indexOf(x);
