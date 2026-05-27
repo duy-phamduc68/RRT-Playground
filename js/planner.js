@@ -19,6 +19,7 @@ export class BasePlanner {
         
         this.iterations = 0;
         this.maxIterations = config.simulation.max_iterations;
+        this.collisionChecks = 0;
         
         this.finished = false;
         this.firstSolutionFound = false;
@@ -77,5 +78,10 @@ export class BasePlanner {
             curr = curr.parent;
         }
         return path.reverse();
+    }
+
+    isCollisionFree(p1, p2) {
+        this.collisionChecks++;
+        return this.env.isCollisionFree(p1, p2, this.config.simulation.robot_radius);
     }
 }

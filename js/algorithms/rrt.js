@@ -31,7 +31,7 @@ export class RRT extends BasePlanner {
         const q_new_pos = this.steer(q_near, q_rand, this.algConfig.step_size);
         
         // 4. Collision Check
-        if (this.env.isCollisionFree(q_near, q_new_pos, this.config.simulation.robot_radius)) {
+        if (this.isCollisionFree(q_near, q_new_pos)) {
             const q_new = {
                 id: this.nodes.length,
                 x: q_new_pos.x,
