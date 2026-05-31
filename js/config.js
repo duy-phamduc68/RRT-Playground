@@ -43,6 +43,7 @@ export const defaultConfig = {
     rendering: {
         draw_grid: true,
         draw_samples: true,
+        show_all_samples: false,
         draw_nodes: false,
         draw_rejected_edges: false,
         tree_edge_width: 1,

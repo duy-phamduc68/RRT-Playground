@@ -244,9 +244,8 @@ export class Renderer {
         // Samples
         if (rConf.draw_samples && p.samples.length > 0) {
             ctx.fillStyle = this.colors.sample;
-            // Draw last 50 samples
             const len = p.samples.length;
-            const start = Math.max(0, len - 50);
+            const start = rConf.show_all_samples ? 0 : Math.max(0, len - 50);
             for (let i = start; i < len; i++) {
                 const s = p.samples[i];
                 ctx.beginPath();
