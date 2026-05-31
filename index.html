@@ -45,8 +45,23 @@
         <!-- Right Stats Panel -->
         <aside id="stats-panel" class="stats-panel">
             <div class="scenario-controls" style="position: relative;">
-                <div style="position: absolute; top: 10px; right: 10px;">
-                    <button id="btn-info" class="btn outline" style="width: 24px; height: 24px; padding: 0; line-height: 22px; font-weight: bold; border-radius: 4px;" title="About">i</button>
+                <div class="scenario-actions">
+                    <button id="btn-info" class="btn outline btn-icon" title="About" aria-label="About">
+                        i
+                    </button>
+                    <button id="btn-light-mode" class="btn outline btn-toggle" title="Switch to light mode" aria-label="Toggle theme">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+                            <line x1="12" y1="2" x2="12" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <line x1="12" y1="19" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <line x1="2" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <line x1="19" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <line x1="4.2" y1="4.2" x2="6.4" y2="6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <line x1="17.6" y1="17.6" x2="19.8" y2="19.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <line x1="17.6" y1="6.4" x2="19.8" y2="4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <line x1="4.2" y1="19.8" x2="6.4" y2="17.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </button>
                 </div>
                 <div class="status-indicator">
                     Status: <span id="scenario-status" class="status-badge pending">Pending</span>

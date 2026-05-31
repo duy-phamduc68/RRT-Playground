@@ -18,22 +18,7 @@ export class Renderer {
         this.canvas.width = this.width;
         this.canvas.height = this.height;
         
-        // Styling based on MATLAB dark theme
-        this.colors = {
-            bg: '#1e1e1e',
-            grid: '#2d2d30',
-            obstacle: '#3f3f46',
-            obstacleBorder: '#555555',
-            robot: '#007acc',
-            start: '#4caf50',
-            goal: '#f44336',
-            treeEdge: 'rgba(200, 200, 200, 0.4)',
-            node: '#007acc',
-            sample: 'rgba(255, 152, 0, 0.5)',
-            rejected: 'rgba(244, 67, 54, 0.2)',
-            path: '#ffeb3b',
-            text: '#cccccc'
-        };
+        this.colors = this.getThemeColors();
         
         this.isLocked = true;
         
@@ -124,6 +109,32 @@ export class Renderer {
         this.ctx.scale(dpr, dpr);
         this.canvas.style.width = `${rect.width}px`;
         this.canvas.style.height = `${rect.height}px`;
+        this.draw();
+    }
+
+    getThemeColors() {
+        const styles = getComputedStyle(document.body);
+        const getVar = (name, fallback) => styles.getPropertyValue(name).trim() || fallback;
+
+        return {
+            bg: getVar('--canvas-bg', '#1e1e1e'),
+            grid: getVar('--canvas-grid', '#2d2d30'),
+            obstacle: getVar('--canvas-obstacle', '#3f3f46'),
+            obstacleBorder: getVar('--canvas-obstacle-border', '#555555'),
+            robot: getVar('--accent', '#007acc'),
+            start: getVar('--success', '#4caf50'),
+            goal: getVar('--danger', '#f44336'),
+            treeEdge: getVar('--canvas-tree-edge', 'rgba(200, 200, 200, 0.4)'),
+            node: getVar('--canvas-node', '#007acc'),
+            sample: getVar('--canvas-sample', 'rgba(255, 152, 0, 0.5)'),
+            rejected: getVar('--canvas-rejected', 'rgba(244, 67, 54, 0.2)'),
+            path: getVar('--canvas-path', '#ffeb3b'),
+            text: getVar('--canvas-text', '#cccccc')
+        };
+    }
+
+    updateTheme() {
+        this.colors = this.getThemeColors();
         this.draw();
     }
     

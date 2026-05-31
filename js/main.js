@@ -44,6 +44,36 @@ function init() {
     document.getElementById('btn-pause').addEventListener('click', togglePause);
     document.getElementById('btn-reset').addEventListener('click', resetScenario);
     document.getElementById('btn-restart').addEventListener('click', restartPlanners);
+
+    const lightModeButton = document.getElementById('btn-light-mode');
+    const sunIcon = `
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+            <line x1="12" y1="2" x2="12" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="12" y1="19" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="2" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="19" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="4.2" y1="4.2" x2="6.4" y2="6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="17.6" y1="17.6" x2="19.8" y2="19.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="17.6" y1="6.4" x2="19.8" y2="4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="4.2" y1="19.8" x2="6.4" y2="17.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+    `;
+    const moonIcon = `
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3a7 7 0 1 0 11.5 11.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    `;
+    const setTheme = (isLight) => {
+        document.body.classList.toggle('light-mode', isLight);
+        lightModeButton.innerHTML = isLight ? moonIcon : sunIcon;
+        lightModeButton.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+        renderers.forEach((renderer) => renderer.updateTheme());
+    };
+    setTheme(false);
+    lightModeButton.addEventListener('click', () => {
+        setTheme(!document.body.classList.contains('light-mode'));
+    });
     
     document.getElementById('btn-info').addEventListener('click', () => {
         Modal.show({
@@ -198,6 +228,8 @@ function setupScenario(e) {
         }
     }
     
+    renderers.forEach((renderer) => renderer.updateTheme());
+
     // Validate and keep start/goal if possible
     let isValid = true;
     const r = State.currentConfig.simulation.robot_radius;
